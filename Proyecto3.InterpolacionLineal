@@ -1,0 +1,235 @@
+#include <stdio.h>					// JOSÉ ALBERTO TIENDA ALEJANDRO 1913852
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#include <math.h>
+#include "pai.h"
+
+int main(){	
+	char entrada[' ']; 
+	int pasos, n, i, valido, opcion;
+	float coeficiente[' '], exponente[' '], x, a, b, fxr, fx, fa, fb, error;
+	do
+	{
+		system("cls");
+		pasos = 0;
+		
+		//Pantalla inicial y lectura de numero de variables
+		do{
+			system("cls");
+			printf("\n\n\n\t METODO DE INTERPOLACION LINEAL");
+			printf("\n\n\t Ingrese el numero de terminos en la ecuacion a resolver: ");
+			fflush(stdin);
+			gets(entrada);
+			valido = EsEnteroValido(entrada, &n, "ERROR: Intenta nuevamente.");
+			if(valido && n <= 0){
+				valido = 0;
+				printf("\n\n\t ERROR: Numero no valido. Intenta nuevamente.");
+				printf("\n\n\n\n\n\t ");
+				system("pause");
+			}
+		} while (!valido);
+		
+		//Lectura de la ecuacion
+		for(i = 0; i < n; i++){
+				
+			do {
+				system("cls");
+				printf("\n\n\t LECTURA DE LA ECUACION f(x) ");
+				printf("\n\n\t Ingresa los valores requeridos.");
+				printf("\n\n\t Termino %d", i+1);		
+				printf("\n\t Coeficiente: ");
+				fflush(stdin);
+				gets(entrada);
+				valido = EsFlotanteValido(entrada, &coeficiente[i], "ERROR: Intente nuevamente");
+			} while (!valido);
+			do {
+				system("cls");
+				printf("\n\n\t LECTURA DE LA ECUACION f(x) ");
+				printf("\n\n\t Ingresa los valores requeridos.");
+				printf("\n\n\t Termino %d", i+1);		
+				printf("\n\t Exponente de la variable (x^?): ");
+				fflush(stdin);
+				gets(entrada);
+				valido = EsFlotanteValido(entrada, &exponente[i], "ERROR: Intente nuevamente");
+			} while (!valido);
+		}
+		
+		//Lectura de los valores iniciales
+		do{
+			system("cls");
+			printf("\n\n\t Ingrese el valor de x deseado para calcular f(x)");
+			printf("\n\n\t x = ");
+			fflush(stdin);
+			gets(entrada);
+			valido = EsFlotanteValido(entrada, &x, "ERROR: Intenta nuevamente.");
+		} while (!valido);
+		do{
+			system("cls");
+			printf("\n\n\t Ingrese el intervalo (a,b) para interpolar, donde a<x y b>x");
+			printf("\n\n\t a = ");
+			fflush(stdin);
+			gets(entrada);
+			valido = EsFlotanteValido(entrada, &a, "ERROR: Intenta nuevamente.");
+			if(valido && a >= x){
+				valido = 0;
+				printf("\n\n\t ERROR: Intenta nuevamente.", valido);
+				printf("\n\n\n\n\n\t ");
+				system("pause");
+			}
+		} while (!valido);
+		do{
+			system("cls");
+			printf("\n\n\t Ingrese el intervalo (a,b) para interpolar, donde a<x y b>x");
+			printf("\n\n\t b = ");
+			fflush(stdin);
+			gets(entrada);
+			valido = EsFlotanteValido(entrada, &b, "ERROR: Intenta nuevamente.");
+			if(valido && b <= x){
+				valido = 0;
+				printf("\n\n\t ERROR: Intenta nuevamente.");
+				printf("\n\n\n\n\n\t ");
+				system("pause");
+			}
+		} while (!valido);
+			
+		fa = 0;
+		fb = 0;
+		fxr = 0;
+		for(i = 0; i < n; i++){
+			fa += pow(a, exponente[i])*coeficiente[i];
+			fb += pow(b, exponente[i])*coeficiente[i];
+			fxr += pow(x, exponente[i])*coeficiente[i]; 	//Calcular f(x) evaluando en la ecuacion
+		}	
+		
+		do{
+			system("cls");
+			printf("\n\n\t Mostrar paso a paso [SI=1, NO=0]: ");
+			fflush(stdin);
+			gets(entrada);
+			valido = EsEnteroValido(entrada, &pasos, "ERROR: Intenta nuevamente.");
+			if(valido && pasos != 1 && pasos != 0){
+				valido = 0;
+				printf("\n\n\t ERROR: Numero no valido. Intenta nuevamente.");
+				printf("\n\n\n\n\n\t ");
+				system("pause");
+			}
+		} while (!valido);
+			
+		fx = fa + ((fb - fa)/(b - a))*(x - a);		//Calcular f(x) mediante el método de interpolacion lineal
+		
+		error = ((fxr - fx)/fxr)*100;
+		if(error < 0)
+			error *= -1;
+	
+
+		//Pantalla final 
+		do{
+			system("cls");
+			printf("\n\n\t Ecuacion f(x) = ");
+			for(i = 0; i < n; i++){
+				if(coeficiente[i] > 0){
+					printf("+");
+				}		
+				printf("%.3fx^%.1f\t", coeficiente[i], exponente[i]);
+			}
+			printf("\n\n\t Objetivo: Encontrar f(%.2f)", x);
+			printf("\n\n\t Intervalo de interpolacion: (%.2f, %.2f)", a, b);
+			printf("\n\n\n\t SOLUCION");
+			if(pasos){
+				printf("\n\n\t FORMULA: f(x) = f(a) + [(f(b) - f(a))/(b - a)] * (x - a)");
+				printf("\n\n\t Sustituir x = %.2f, a = %.2f, b = %.2f, f(a) = %.2f, f(b) = %.2f", x, a, b, fa, fb);
+				printf("\n\n\t f(%.2f) = %.2f + [(%.2f - %.2f)/(%.2f - %.2f)]*(%.2f - %.2f)", x, fa, fb, fa, b, a, x, a);
+				printf("\n\t f(%.2f) = %.2f", x, fx);
+				printf("\n\n\t Valor verdadero: %.2f", fxr);
+			}
+			else{	
+				printf("\n\n\t f(%.2f) = %.2f", x, fx);
+				printf("\n\t Valor verdadero: %.2f", fxr);
+			}
+			if(pasos){
+				printf("\n\n\t Error verdadero = | (valor verdadero - aproximado) / valor verdadero | * 100%%");
+				printf("\n\t Error verdadero = | (%.2f - %.2f) / %.2f | * 100%%", fxr, fx, fxr);
+				printf("\n\t Error verdadero = %.2f %% ", error);
+			}
+			else
+				printf("\n\n\t Error verdadero = %.2f %% ", error);
+			printf("\n\n\t Interpolar para otra ecuacion [SI=1, NO=0]: ");
+			fflush(stdin);
+			gets(entrada);
+			valido = EsEnteroValido(entrada, &opcion, "ERROR: Intenta nuevamente.");
+			if(valido && opcion != 1 && opcion != 0){
+				valido = 0;
+				printf("\n\t ERROR: Intenta nuevamente.");
+				printf("\n\n\n\n\n\t ");
+				system("pause");
+			}
+		} while (!valido);
+	
+	} while (opcion==1);
+
+	return 0;
+}										
+																	
+int EsEnteroValido(char entrada[], int* salida, char mensajeDeError[])
+{
+	int i, valido = 1;
+
+	if (entrada[0] == '\0')
+		valido = 0;
+	else
+		for (i = 0; i < strlen(entrada); i++)
+		{
+			if (!isdigit(entrada[i]) && entrada[i]!= '-')
+				valido = 0;
+		}
+
+	if (valido == 0)
+	{
+		printf("\n\n\t %s", mensajeDeError);
+		printf("\n\n\n\n\n\t ");
+		system("pause");
+	}
+	else
+		*salida = atoi(entrada);
+	return valido;
+}
+
+int EsFlotanteValido(char entrada[], float* salida, char mensajeDeError[])
+{
+	int i, valido = 1, punto = 0;
+	
+	if(entrada[0] == '\0')
+		valido = 0;
+		
+	if (!isdigit(entrada[0]) && entrada[0] != '.' && entrada[0] != '-')
+		valido = 0;
+				
+	for (i = 1; i < strlen(entrada); i++){
+		
+		if (!isdigit(entrada[i]) && entrada[i] != '.')
+			valido = 0;
+		
+		if(entrada[i] == '.' && punto == 0)
+			punto = 1;
+		else
+			if(entrada[i] == '.' && punto == 1)
+				valido = 0;
+	}
+	
+	if(strlen(entrada) == 1){
+		if(entrada[0] == '.' || entrada[0] == '-')
+			valido = 0;
+	}
+	
+	if (valido == 0)
+	{
+		printf("\n\n\t %s", mensajeDeError);
+		printf("\n\n\n\n\n\t ");
+		system("pause");
+	}
+	else
+		*salida = atof(entrada);
+	
+	return valido;
+}
